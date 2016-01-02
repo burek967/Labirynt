@@ -20,6 +20,11 @@ CH_PL=("\u25B2" "\u25B6" "\u25BC" "\u25C0")
 DIR=0
 [ "$(signAt $PL_X 2)" = "$CH_FREE" ] && DIR=1
 
+VIEWS=()
+for(( i=0; $i < 8; i++ )); do
+    VIEWS[i]=$(cat "art/${i}.txt")
+done
+
 draw() {
     x=0
     DIR_L=$[DIR-1]
@@ -29,12 +34,47 @@ draw() {
     [ "$(signAt $[PL_X+DX[DIR_L]] $[PL_Y+DY[DIR_L]])" = "$CH_FREE" ] && x=$[x|1]
     [ "$(signAt $[PL_X+DX[DIR]] $[PL_Y+DY[DIR]])" = "$CH_FREE" ]     && x=$[x|2]
     [ "$(signAt $[PL_X+DX[DIR_R]] $[PL_Y+DY[DIR_R]])" = "$CH_FREE" ] && x=$[x|4]
-    cat "art/${x}.txt"
+    printf "%s\n" "${VIEWS[$x]}"
 }
 
-# 13x6
+# 13x5
 minimap() {
- # todo
+    i=$[PL_X-2]
+    x=5
+    while [ $i -lt 0 ]; do
+        echo "             "
+        ((i++))
+        ((x--))
+    done
+    L_sp=""
+    R_sp=""
+    l=$[PL_Y-6]
+    r=$[PL_Y+6]
+    while [ $l -lt 0 ]; do
+        L_sp+=" "
+        ((l++))
+    done
+    while [ $r -gt $T_COLS ]; do
+        R_sp+=" "
+        ((r--))
+    done
+    while [ $x -gt 0 ] && [ $i -lt $T_ROWS ]; do
+        printf "$L_sp"
+        for(( t=$l; $t < r; t++ )); do
+            if [ $t -eq $PL_Y ] && [ $i -eq $PL_X ]; then
+                printf "${CH_PL[DIR]}"
+            else
+                signAt $i $t
+            fi
+        done
+        echo "$R_sp"
+        ((i++))
+        ((x--))
+    done
+    while [ $x -gt 0 ]; do
+        echo "             "
+        ((x--))
+    done
 }
 
 printmaze
@@ -61,5 +101,6 @@ while read -sn 1 key; do
     esac
     draw
     printmaze
+    minimap
 done
 
