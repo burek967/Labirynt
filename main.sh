@@ -2,7 +2,7 @@
 
 # jeśli okno terminala nie ma zmieniać rozmiaru,
 # należy zakomentować tę linię
-printf "\e[8;21;39t"
+printf "\e[8;22;39t"
 
 . maze.sh
 
@@ -13,7 +13,7 @@ signAt() {
     printf "${maze[$1*$T_COLS+$2]}"
 }
 
-MINIMAP=0
+MINIMAP=1
 PL_X=$[$T_ROWS-2]
 PL_Y=1
 
@@ -40,13 +40,18 @@ draw() {
     [ "$(signAt $[PL_X+DX[DIR_L]] $[PL_Y+DY[DIR_L]])" = "$CH_FREE" ] && x=$[x|1]
     [ "$(signAt $[PL_X+DX[DIR]] $[PL_Y+DY[DIR]])" = "$CH_FREE" ]     && x=$[x|2]
     [ "$(signAt $[PL_X+DX[DIR_R]] $[PL_Y+DY[DIR_R]])" = "$CH_FREE" ] && x=$[x|4]
-    VIEW=(${VIEWS[x]})
-    MAP=($(minimap))
-    printf "%s\n" "${VIEWS[$x]}" | head -14
-    printf "%s+-------------+%s\n" ${VIEW[14]:0:12} ${VIEW[14]:27:12}
-    for ((i=0; $i < 5 ;i++)); do
-        printf "%s|%s|%s\n" ${VIEW[i+15]:0:12} ${MAP[i]} ${VIEW[i+15]:27:12}
-    done
+    if [ $MINIMAP -ne 0 ]; then
+        VIEW=(${VIEWS[x]})
+        MAP=($(minimap))
+        printf "%s\n" "${VIEWS[$x]}" | head -14
+        printf "%s+-------------+%s\n" ${VIEW[14]:0:12} ${VIEW[14]:27:12}
+        for ((i=0; $i < 5 ;i++)); do
+            printf "%s|%s|%s\n" ${VIEW[i+15]:0:12} ${MAP[i]} ${VIEW[i+15]:27:12}
+        done
+    else
+        echo "${VIEWS[$x]}"
+    fi
+    echo "+-----------+-------------+-----------+"
 }
 
 # 13x5
@@ -117,6 +122,9 @@ while read -sn 1 key; do
         l|L)
             DIR=$[DIR+1]
             [ $DIR -gt 3 ] && DIR=$[DIR-4]
+            ;;
+        m|M)
+            MINIMAP=$[1-MINIMAP]
             ;;
     esac
     draw
