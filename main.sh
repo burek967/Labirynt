@@ -51,7 +51,8 @@ draw() {
     else
         echo "${VIEWS[$x]}"
     fi
-    echo "+-----------+-------------+-----------+"
+    echo   "+-----------+-------------+-----------+"
+    [ $MINIMAP -eq 0 ] && printf "   Kierunek: ${CH_PL[DIR]}\r" 
 }
 
 # 13x5
@@ -97,36 +98,45 @@ minimap() {
 draw
 moves=0
 while read -sn 1 key; do
-    ((moves++))
+    if [ $key = '[' ]; then
+        read -sn 1 tmp
+        case $tmp in
+            A) key='k' ;;
+            B) key='j' ;;
+            C) key='l' ;;
+            D) key='h' ;;
+        esac
+    fi
+    NEWDIR=-1
     case $key in
-        k|K)
-            if [ "$(signAt $[PL_X+DX[DIR]] $[PL_Y+DY[DIR]])" = "$CH_FREE" ]; then
-                PL_X=$[PL_X+DX[DIR]]
-                PL_Y=$[PL_Y+DY[DIR]]
-            fi
-            if [ $PL_X -eq 1 ] && [ $PL_Y -eq $[T_COLS-1] ]; then
-                draw
-                echo "Wygrana!"
-                echo "Labirynt pokonano w ${moves} ruchach."
-                exit 0
-            fi
-            ;;
-        j|J)
-            DIR=$[DIR-2]
-            [ $DIR -lt 0 ] && DIR=$[DIR+4]
-            ;;
-        h|H)
-            DIR=$[DIR-1]
-            [ $DIR -lt 0 ] && DIR=$[DIR+4]
-            ;;
-        l|L)
-            DIR=$[DIR+1]
-            [ $DIR -gt 3 ] && DIR=$[DIR-4]
-            ;;
-        m|M)
-            MINIMAP=$[1-MINIMAP]
+        h|H) NEWDIR=3 ;;
+        j|J) NEWDIR=2 ;;
+        k|K) NEWDIR=0 ;;
+        l|L) NEWDIR=1 ;;
+        m|M) MINIMAP=$[1-MINIMAP] ;;
+        q|Q)
+            printf "\e[8;%d;%dt" $[T_ROWS+3] $T_COLS
+            echo "Przegrana"
+            echo "Liczba ruchow: $moves"
+            printmaze
+            exit 0
             ;;
     esac
+    if [ $NEWDIR -eq $DIR ]; then
+        if [ "$(signAt $[PL_X+DX[DIR]] $[PL_Y+DY[DIR]])" = "$CH_FREE" ]; then
+            ((moves++))
+            PL_X=$[PL_X+DX[DIR]]
+            PL_Y=$[PL_Y+DY[DIR]]
+        fi
+        if [ $PL_X -eq 1 ] && [ $PL_Y -eq $[T_COLS-1] ]; then
+            draw
+            echo "Wygrana!"
+            echo "Labirynt pokonano w ${moves} ruchach."
+            exit 0
+        fi
+    elif [ $NEWDIR -ge 0 ]; then
+        DIR=$NEWDIR
+    fi
     draw
     #printmaze
     #minimap
