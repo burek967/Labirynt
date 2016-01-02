@@ -84,7 +84,11 @@ printmaze() {
     local t=0
     for(( i=0; $i < $T_ROWS; i++ )); do
         for(( j=0; $j < $T_COLS; j++ )); do
-            printf "${maze[$t]}"
+            if [ $t -eq $[$PL_X*$T_COLS+$PL_Y] ]; then
+                printf "${CH_PL[DIR]}"
+            else
+                printf "${maze[$t]}"
+            fi
             ((t++))
         done
         printf '\n'
@@ -93,7 +97,7 @@ printmaze() {
 
 # todo: bfs do późniejszego użycia przy wskazówkach
 
-setmaze 20 50
-genmaze
-solve $[$T_ROWS-2] 1
-printmaze
+#setmaze 20 50
+#genmaze
+#solve $[$T_ROWS-2] 1
+#printmaze
