@@ -1,2 +1,4 @@
 # Pliki tymczasowe vima
 *.swp
+# Pliki tymczasowe nano
+*.save
