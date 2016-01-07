@@ -122,11 +122,17 @@ while read -sn 1 key; do
             exit 0
             ;;
     esac
-    if [ $NEWDIR -eq $DIR ]; then
-        if [ "$(signAt $[PL_X+DX[DIR]] $[PL_Y+DY[DIR]])" = "$CH_FREE" ]; then
+    if [ $NEWDIR -ge 0 ]; then
+        if [ $NEWDIR -ne 2 ]; then
+            DIR=$[$[DIR+NEWDIR]%4]
+            NEWDIR=$DIR
+        else
+            NEWDIR=$[$[DIR+2]%4]
+        fi
+        if [ "$(signAt $[PL_X+DX[NEWDIR]] $[PL_Y+DY[NEWDIR]])" = "$CH_FREE" ]; then
             ((moves++))
-            PL_X=$[PL_X+DX[DIR]]
-            PL_Y=$[PL_Y+DY[DIR]]
+            PL_X=$[PL_X+DX[NEWDIR]]
+            PL_Y=$[PL_Y+DY[NEWDIR]]
         fi
         if [ $PL_X -eq 1 ] && [ $PL_Y -eq $[T_COLS-1] ]; then
             draw
@@ -134,8 +140,6 @@ while read -sn 1 key; do
             echo "Labirynt pokonano w ${moves} ruchach."
             exit 0
         fi
-    elif [ $NEWDIR -ge 0 ]; then
-        DIR=$NEWDIR
     fi
     draw
     #printmaze
