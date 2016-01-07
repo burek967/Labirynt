@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# jeśli okno terminala nie ma zmieniać rozmiaru,
-# należy zakomentować tę linię
+ROWS_OLD=$(tput lines)
+COLS_OLD=$(tput cols)
+
 printf "\e[8;22;39t"
 
 . maze.sh
@@ -115,10 +116,11 @@ while read -sn 1 key; do
         l|L) NEWDIR=1 ;;
         m|M) MINIMAP=$[1-MINIMAP] ;;
         q|Q)
-            printf "\e[8;%d;%dt" $[T_ROWS+3] $T_COLS
+            #printf "\e[8;%d;%dt" $[T_ROWS+3] $T_COLS
+            printf "\e[8;%d;%dt" $ROWS_OLD $COLS_OLD
+            printmaze
             echo "Przegrana"
             echo "Liczba ruchow: $moves"
-            printmaze
             exit 0
             ;;
     esac
@@ -135,7 +137,9 @@ while read -sn 1 key; do
             PL_Y=$[PL_Y+DY[NEWDIR]]
         fi
         if [ $PL_X -eq 1 ] && [ $PL_Y -eq $[T_COLS-1] ]; then
-            draw
+            #printf "\e[8;%d;%dt" $[T_ROWS+3] $T_COLS
+            printf "\e[8;%d;%dt" $ROWS_OLD $COLS_OLD
+            printmaze
             echo "Wygrana!"
             echo "Labirynt pokonano w ${moves} ruchach."
             exit 0
