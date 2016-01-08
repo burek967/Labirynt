@@ -9,6 +9,12 @@
 ### Dodatkowe założenia
 * Wskazówki
 * Podświetlenie odwiedzonych pól
+* Edytor labiryntu
+* Ranking
+* Czas przejścia
+* Punkty (zbierane)
+* Ekran początkowy
+* Zasady gry
 ## Podział prac
 ### Rafał Burczyński
 * Generowanie labiryntu
