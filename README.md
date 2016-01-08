@@ -13,7 +13,7 @@
 ### Rafał Burczyński
 * Generowanie labiryntu
 * Minimapa
-* Podświetlenie odwiedzonych pól
 ### Michał Stanisz
 * Widok z pierwszej osoby
+* Podświetlenie odwiedzonych pól
 * Wskazówki
