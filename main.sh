@@ -38,9 +38,9 @@ draw() {
     DIR_R=$[DIR+1]
     [ $DIR_L -lt 0 ] && DIR_L=$[DIR_L+4]
     [ $DIR_R -gt 3 ] && DIR_R=$[DIR_R-4]
-    [ "$(signAt $[PL_X+DX[DIR_L]] $[PL_Y+DY[DIR_L]])" = "$CH_FREE" ] && x=$[x|1]
-    [ "$(signAt $[PL_X+DX[DIR]] $[PL_Y+DY[DIR]])" = "$CH_FREE" ]     && x=$[x|2]
-    [ "$(signAt $[PL_X+DX[DIR_R]] $[PL_Y+DY[DIR_R]])" = "$CH_FREE" ] && x=$[x|4]
+    [ "$(signAt $[PL_X+DX[DIR_L]] $[PL_Y+DY[DIR_L]])" != "$(printf $CH_WALL)" ] && x=$[x|1]
+    [ "$(signAt $[PL_X+DX[DIR]] $[PL_Y+DY[DIR]])" != "$(printf $CH_WALL)" ]     && x=$[x|2]
+    [ "$(signAt $[PL_X+DX[DIR_R]] $[PL_Y+DY[DIR_R]])" != "$(printf $CH_WALL)" ] && x=$[x|4]
     if [ $MINIMAP -ne 0 ]; then
         VIEW=(${VIEWS[x]})
         MAP=($(minimap))
@@ -131,8 +131,9 @@ while read -sn 1 key; do
         else
             NEWDIR=$[$[DIR+2]%4]
         fi
-        if [ "$(signAt $[PL_X+DX[NEWDIR]] $[PL_Y+DY[NEWDIR]])" = "$CH_FREE" ]; then
+        if [ "$(signAt $[PL_X+DX[NEWDIR]] $[PL_Y+DY[NEWDIR]])" != "$(printf $CH_WALL)" ]; then
             ((moves++))
+            maze[PL_X*T_COLS+PL_Y]='.'
             PL_X=$[PL_X+DX[NEWDIR]]
             PL_Y=$[PL_Y+DY[NEWDIR]]
         fi
