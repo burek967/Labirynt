@@ -96,6 +96,28 @@ minimap() {
     done
 }
 
+updateRanking() {
+    [ ! -f ranking.db ] && touch ranking.db
+    scores=($(cat ranking.db | base64 --decode))
+    ask=0
+    lastScore=$(echo ${scores[9]} | cut -d ';' -f 1)
+    if [ -z "$lastScore" ] || [ "$lastScore" -gt "$1" ]; then
+        echo "Świetny wynik! Podaj swoje imię: "
+        read name
+        scores+=("$1;$name;$(date +'%d-%m-%Y %R')")
+        sortedScores=($(printf '%s\n' ${scores[@]} | sort -ns))
+        printf '%s\n' ${sortedScores[@]} | head -10 | base64 > ranking.db
+    fi
+    S=($(cat ranking.db | base64 --decode))
+    echo ${#S[@]}
+    echo "+-------+----------------------+----------------------+"
+    for line in ${S[@]}; do
+        tmp=($(echo $line | sed 's/;/\n/g'))
+        printf "| %5ss| %-20s | %-20s |\n" ${tmp[0]} ${tmp[1]:0:20} ${tmp[2]:0:20}
+    done
+    echo "+-------+----------------------+----------------------+"
+}
+
 draw
 startTime=$(date +%s)
 moves=0
@@ -140,13 +162,14 @@ while read -sn 1 key; do
         fi
         if [ $PL_X -eq 1 ] && [ $PL_Y -eq $[T_COLS-1] ]; then
             #printf "\e[8;%d;%dt" $[T_ROWS+3] $T_COLS
-            endTime=$(date +%s)
+            TIME=$[$(date +%s)-startTime]
             printf "\e[8;%d;%dt" $ROWS_OLD $COLS_OLD
             clear
             printmaze
             echo "Wygrana!"
             echo "Labirynt pokonano w ${moves} ruchach."
-            echo "Czas: $[endTime - startTime]s"
+            echo "Czas: ${TIME}s"
+            updateRanking $TIME
             exit 0
         fi
     fi

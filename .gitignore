@@ -2,3 +2,4 @@
 *.swp
 # Pliki tymczasowe nano
 *.save
+ranking.db
