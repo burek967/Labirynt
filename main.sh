@@ -32,6 +32,47 @@ done
 
 IFS=$'\n'
 
+startScreen() {
+    clear
+    tput cup 1 12
+    tput setaf 6
+    printf "L A B I R Y N T"
+    tput cup 3 2
+    tput setaf 4
+    printf "ZASADY GRY"
+    tput cup 5 4
+    tput setaf 3
+    printf "Kieruj się w stronę wyjścia!"
+    tput cup 6 5
+    printf "(prawy górny róg)"
+    tput cup 8 2
+    tput setaf 4
+    printf "STEROWANIE"
+    tput cup 10 4
+    tput setaf 2
+    printf "strzałki/hjkl"
+    tput cup 11 5
+    tput setaf 3
+    printf "poruszanie się po labiryncie"
+    tput cup 13 4
+    tput setaf 2
+    printf "m"
+    tput cup 14 5
+    tput setaf 3
+    printf "przełącza minimapę"
+    tput cup 16 4
+    tput setaf 2
+    printf "q"
+    tput cup 17 5
+    tput setaf 3
+    printf "wyjście z gry"
+
+    tput cup 20 2
+    tput setaf 4
+    printf "NACIŚNIJ DOWOLNY KLAWISZ"
+    read -n 1
+}
+
 draw() {
     x=0
     DIR_L=$[DIR-1]
@@ -47,7 +88,7 @@ draw() {
         printf "%s\n" "${VIEWS[$x]}" | head -14
         printf "%s+-------------+%s\n" ${VIEW[14]:0:12} ${VIEW[14]:27:12}
         for ((i=0; $i < 5 ;i++)); do
-            printf "%s|%s|%s\n" ${VIEW[i+15]:0:12} ${MAP[i]} ${VIEW[i+15]:27:12}
+            printf "%s|\e[33m%s\e[34m|%s\n" ${VIEW[i+15]:0:12} ${MAP[i]} ${VIEW[i+15]:27:12}
         done
     else
         echo "${VIEWS[$x]}"
@@ -104,6 +145,7 @@ updateRanking() {
     if [ -z "$lastScore" ] || [ "$lastScore" -gt "$1" ]; then
         echo "Świetny wynik! Podaj swoje imię: "
         read name
+        name=$(echo $name | sed 's/;//g')
         scores+=("$1;$name;$(date +'%d-%m-%Y %R')")
         sortedScores=($(printf '%s\n' ${scores[@]} | sort -ns))
         printf '%s\n' ${sortedScores[@]} | head -10 | base64 > ranking.db
@@ -118,6 +160,7 @@ updateRanking() {
     echo "+-------+----------------------+----------------------+"
 }
 
+startScreen
 draw
 startTime=$(date +%s)
 moves=0
@@ -165,6 +208,7 @@ while read -sn 1 key; do
             TIME=$[$(date +%s)-startTime]
             printf "\e[8;%d;%dt" $ROWS_OLD $COLS_OLD
             clear
+            tput sgr0
             printmaze
             echo "Wygrana!"
             echo "Labirynt pokonano w ${moves} ruchach."
