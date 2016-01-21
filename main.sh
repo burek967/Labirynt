@@ -97,6 +97,7 @@ minimap() {
 }
 
 draw
+startTime=$(date +%s)
 moves=0
 while read -sn 1 key; do
     if [ $key = '[' ]; then
@@ -139,10 +140,13 @@ while read -sn 1 key; do
         fi
         if [ $PL_X -eq 1 ] && [ $PL_Y -eq $[T_COLS-1] ]; then
             #printf "\e[8;%d;%dt" $[T_ROWS+3] $T_COLS
+            endTime=$(date +%s)
             printf "\e[8;%d;%dt" $ROWS_OLD $COLS_OLD
+            clear
             printmaze
             echo "Wygrana!"
             echo "Labirynt pokonano w ${moves} ruchach."
+            echo "Czas: $[endTime - startTime]s"
             exit 0
         fi
     fi
