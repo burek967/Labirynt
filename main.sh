@@ -184,6 +184,8 @@ while read -sn 1 key; do
         q|Q)
             #printf "\e[8;%d;%dt" $[T_ROWS+3] $T_COLS
             printf "\e[8;%d;%dt" $ROWS_OLD $COLS_OLD
+            clear
+            tput sgr0
             printmaze
             echo "Przegrana"
             echo "Liczba ruchow: $moves"
